@@ -567,7 +567,7 @@ frac.var.expl <- function(fac.vec, x, x.pca) {
 
 varex <- function(cm, md, norm.fac, foi, x=c()) {
   genes <- rownames(cm)[apply(cm > 0, 1, sum) >= 5]
-  cat('Normalizing', length(genes), 'that are present in at least 5 cells\n')
+  cat('Normalizing', length(genes), 'genes that are present in at least 5 cells\n')
   expr <- norm.nb.reg(cm[genes, ], md[, norm.fac, drop=FALSE], pr.th = 30)
   vg <- rownames(expr)[scale(sqrt(apply(expr^2, 1, sum))) > 1]
   x <- expr[vg, ]

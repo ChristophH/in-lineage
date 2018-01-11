@@ -40,8 +40,6 @@ result.bn <- paste(input.bn, emin, sep = '_')
 
 # load maturation trajectory results and keep only post-mitotic cells from one eminence
 md <- readRDS(file = sprintf('results/%s_maturation_trajectory_meta_data.Rds', input.bn))
-# tmp
-#md$eminence <- gsub('_\\d+$', '', md$sample.name)
 cm <- readRDS('data/dropseq_digitial_expression.Rds')
 
 md <- subset(md, postmitotic & eminence == emin)
