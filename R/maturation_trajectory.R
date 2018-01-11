@@ -1,4 +1,21 @@
-# short description
+# this script performs the following steps:
+# 1) read in drop-seq digital expression and normalize using regularized NB regression
+# 2) cluster all cells and remove contaminating cell populations
+# 3) fit a maturation trajectory through the remaining cells
+# 4) identify maturation score cutoff to separate mitotic from post-mitotic cells
+# 5) visualize results
+# 6) create smooth expression (as function of maturation score) for visualization later on
+
+# these files are created in results directory:
+# - all_samples_normalized_expression.Rds
+# - all_samples_maturation_trajectory_meta_data.Rds
+# - all_samples_maturation_trajectory.pdf
+# - all_samples_smooth_expression.Rds
+
+# running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
+# (using 6 processors for some of the steps)
+# steps 1-5: ca. 75 minutes
+# step 6: ca. 95 minutes
 
 # support functions are defined in library
 source('R/lib.R')
@@ -11,14 +28,6 @@ options(mc.cores = 6)
 cm <- readRDS('data/dropseq_digitial_expression.Rds')
 md <- readRDS('data/dropseq_meta_data.Rds')
 
-
-# for demonstration purposes speed up computation by subsetting the data
-#use.cells <- grepl('CGE_1', md$sample.name) 
-#use.cells <- grepl('CGE_1', md$sample.name) | grepl('MGE_[1|3|4]', md$sample.name)
-#use.cells <- grepl('[C|M]GE_', md$sample.name)  # 13K cells
-#cm <- cm[, use.cells]
-#md <- md[use.cells, ]
-
 # set basename for result files
 result.bn <- 'all_samples'
 
@@ -29,7 +38,7 @@ md$cc.phase <- cc$phase
 
 # normalize data 
 genes <- rownames(cm)[apply(cm > 0, 1, mean) >= 0.005 & apply(cm > 0, 1, sum) >= 3]
-cat('Normalizing', length(genes), 'that are present in at least 0.5% of the cells AND in at least 3 cells\n')
+cat('Normalizing', length(genes), 'genes that are present in at least 0.5% of the cells AND in at least 3 cells\n')
 
 md$mols.per.gene <- md$mols / md$genes
 expr <- norm.nb.reg(cm[genes, ], md[, c('reads', 'mols.per.gene', 'cc')], pr.th = 30)

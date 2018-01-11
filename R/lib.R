@@ -8,6 +8,7 @@ library('igraph')
 library('princurve')
 library('ggplot2')
 library('inline')
+library('gplots')
 
 
 ###############################################################################
@@ -324,7 +325,7 @@ de.nb.reg.helper <- function(cm, md, com.fac, grp.fac, grp.val1, grp.val2, min.f
   tmp.md <- md[c(sel.1, sel.2), ]
   #tmp.md$group <- factor(as.character(tmp.md[, grp.fac] %in% grp.val1), ordered=TRUE, levels=c('TRUE', 'FALSE'))
   tmp.md$de.nb.reg.group <- c(rep(0, length(sel.1)), rep(1, length(sel.2)))
-  cat(sprintf('Running de.nb on %d genes and %d + %d cells.\n', nrow(cm), length(sel.1), length(sel.2)))
+  cat(sprintf('Running differential expression test on %d genes and %d + %d cells.\n', nrow(cm), length(sel.1), length(sel.2)))
   theta.fit <- theta.reg(cm, tmp.md[, com.fac, drop=FALSE], bins=bins)
   tmp <- mclapply(1:nrow(cm), function(i) de.nb.reg(cm[i, ], theta.fit[i], tmp.md, com.fac, 'de.nb.reg.group'))
   res <- as.data.frame(matrix(unlist(tmp), ncol=length(tmp[[1]]), byrow=TRUE))
@@ -473,7 +474,7 @@ mst.avg <- function(dmap.dmat, n, ss, sp.weights=NULL) {
   i <- 0
   while (sum(count.mat < n) > 0) {
     i <- i + 1
-    cat(i, ' ')
+    cat(sprintf('%d ', i))
     
     p <- exp(-(count.mat+1))
     vals <- sample.int(length(count.mat), ss, replace=TRUE, prob=p)
