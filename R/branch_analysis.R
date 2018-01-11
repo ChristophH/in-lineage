@@ -13,7 +13,7 @@
 # - all_samples_CGE_branch_analysis_top_marker_genes.csv
 
 # running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
-# (using 6 processors for some of the steps)
+# (using 6 cores for some of the steps)
 # CGE: ca. 10 minutes
 # LGE: ca. 9 minutes
 # MGE: ca. 6 minutes

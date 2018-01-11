@@ -13,7 +13,7 @@
 # - all_samples_smooth_expression.Rds
 
 # running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
-# (using 6 processors for some of the steps)
+# (using 6 cores for some of the steps)
 # steps 1-5: ca. 75 minutes
 # step 6: ca. 95 minutes
 
