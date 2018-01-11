@@ -38,7 +38,7 @@ these files are created in the results directory:
 * all\_samples\_smooth\_expression.Rds  
 
 running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
-(using 6 processors for some of the steps)  
+(using 6 cores for some of the steps)  
 
 * steps 1-5: ca. 75 minutes
 * step 6: ca. 95 minutes
@@ -58,7 +58,7 @@ these files are created in results directory:
 * all\_samples\_temporal\_mitotic\_genes.pdf
 
 running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
-(using 6 processors for some of the steps)
+(using 6 cores for some of the steps)
 
 * ca. 6 minutes
 
@@ -81,7 +81,7 @@ these files are created in results directory (in the case of CGE):
 * all\_samples\_CGE\_branch\_analysis\_top\_marker\_genes.csv
 
 running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
-(using 6 processors for some of the steps)
+(using 6 cores for some of the steps)
 
 * CGE: ca. 10 minutes
 * LGE: ca. 9 minutes
