@@ -11,6 +11,8 @@
 # - all_samples_CGE_branch_analysis_meta_data.Rds
 # - all_samples_CGE_branch_analysis_top_de_genes.pdf
 # - all_samples_CGE_branch_analysis_top_marker_genes.csv
+# - all_samples_CGE_branch_analysis_de_genes.Rds
+# - all_samples_CGE_branch_analysis_expr_branch_avg.Rds
 
 # running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
 # (using 6 cores for some of the steps)
@@ -102,6 +104,15 @@ for (b in sort(unique(branch))) {
 }
 branch.label[branch.label == 0] <- NA
 
+# for consistent branch naming, use expression pf some marker genes
+# to order the branch IDs
+new.branch.label <- factor(branch.label)
+goi <- c('Tcf4', 'Ebf1')
+goi.expr.avg <- sapply(goi, function(gene) aggregate(expr[gene, ], by=list(branch.label), FUN=mean)$x)
+tmp <- data.frame(apply(goi.expr.avg, 2, function(x) -(x==max(x))))
+levels(new.branch.label) <- do.call(order, tmp)
+branch.label <- as.numeric(as.character(new.branch.label))
+
 # append results to meta data
 md$root <- (1:nrow(md)) == root
 md$dfr <- dist.from.root
@@ -173,3 +184,11 @@ branch.markers <- data.frame(gene=rownames(tmp), branch=apply(tmp, 1, which.max)
 write.csv(branch.markers, row.names = FALSE,
           file = sprintf('results/%s_branch_analysis_top_marker_genes.csv', result.bn))
 
+# save the following for later
+# full set of differential expression results
+de.genes.union <- unique(unlist(de.genes))
+saveRDS(de.genes.union, file = sprintf('results/%s_branch_analysis_de_genes.Rds', result.bn))
+# branch-averaged expression
+expr.branch.avg <- t(apply(expr, 1, function(x) aggregate(x, by=list(branch=md$branch), FUN=mean)$x))
+colnames(expr.branch.avg) <- paste('Branch', sort(unique(md$branch)))
+saveRDS(expr.branch.avg, file = sprintf('results/%s_branch_analysis_expr_branch_avg.Rds', result.bn))

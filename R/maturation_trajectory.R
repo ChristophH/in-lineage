@@ -66,45 +66,10 @@ md <- md[use.cells, ]
 
 
 # fit maturation trajectory
-cat('Fitting maturation trajectory\n')
-genes <- apply(cm[rownames(expr), ] > 0, 1, mean) >= 0.02 & apply(cm[rownames(expr), ] > 0, 1, sum) >= 3
-cat('Using', length(genes), 'genes in diffusion map\n')
-rd <- dim.red(expr[genes, ], max.dim=50, ev.red.th=0.04)
-# for a consisten look use Nes expression to orient each axis
-for (i in 1:ncol(rd)) {
-  if (cor(expr['Nes', ], rd[, i]) > 0) {
-    rd[, i] <- -rd[, i]
-  }
-}
-
-md <- cbind(md, rd)
-# save the updated meta data
-saveRDS(md, file = sprintf('results/%s_maturation_trajectory_meta_data.Rds', result.bn))
-
-# fit principal curve through the data
-pricu <- principal.curve(rd, smoother='lowess', trace=TRUE, f=1/3, stretch=333)
-pc.line <- as.data.frame(pricu$s[order(pricu$lambda), ])
-md$maturation.score <- pricu$lambda/max(pricu$lambda)
-
-# orient maturation score using Nes expression
-if (cor(md$maturation.score, expr['Nes', ]) > 0) {
-  md$maturation.score <- -(md$maturation.score - max(md$maturation.score))
-}
-
-# use 1% of neighbor cells to smooth maturation score
-md$maturation.score.smooth <- nn.smooth(md$maturation.score, rd[, 1:2], round(ncol(expr)*0.01, 0))
-
-
-# pick maturation score cutoff to separate mitotic from post-mitotic cells
-in.phase <- md$cc.phase != 0
-fit <- loess(as.numeric(in.phase) ~ md$maturation.score.smooth, span=0.5, degree=2)
-md$cc.phase.fit <- fit$fitted
-# pick MT threshold based on drop in cc.phase cells
-# ignore edges of MT because of potential outliers
-mt.th <- max(subset(md, cc.phase.fit > mean(in.phase)/2 & maturation.score.smooth >= 0.2 & maturation.score.smooth <= 0.8)$maturation.score.smooth)
-
-md$postmitotic <- md$maturation.score.smooth > mt.th
-
+mat.traj <- maturation.trajectory(cm, md, expr)
+md <- mat.traj$md
+pc.line <- mat.traj$pc.line
+mt.th <- mat.traj$mt.th
 
 # save the meta data including the maturation trajectory results
 saveRDS(md, file = sprintf('results/%s_maturation_trajectory_meta_data.Rds', result.bn))
@@ -128,7 +93,7 @@ g <- ggplot(md, aes(DMC1, DMC2)) + geom_point(aes(color=rank(maturation.score.sm
 plot(g)
 
 g <- ggplot(md, aes(maturation.score.smooth, cc.phase.fit)) + geom_point(aes(color=postmitotic), size=2) +
-  geom_hline(yintercept =  mean(in.phase)/2) + geom_vline(xintercept = mt.th) +
+  geom_hline(yintercept =  mean(md$in.cc.phase)/2) + geom_vline(xintercept = mt.th) +
   theme_grey(base_size=12) + labs(x='Maturation score', y='Fraction of cells in G2/M or S phase')
 plot(g)
 

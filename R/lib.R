@@ -240,10 +240,9 @@ cluster.the.data.simple <- function(cm, expr, k, sel.g=NA, min.mean=0.001,
 # for maturation trajectory
 
 # fit maturation trajectory
-maturation.trajectory <- function(cm, md, expr) {
+maturation.trajectory <- function(cm, md, expr, pricu.f=1/3) {
   cat('Fitting maturation trajectory\n')
   genes <- apply(cm[rownames(expr), ] > 0, 1, mean) >= 0.02 & apply(cm[rownames(expr), ] > 0, 1, sum) >= 3
-  cat('Using', length(genes), 'genes in diffusion map\n')
   rd <- dim.red(expr[genes, ], max.dim=50, ev.red.th=0.04)
   # for a consisten look use Nes expression to orient each axis
   for (i in 1:ncol(rd)) {
@@ -255,7 +254,7 @@ maturation.trajectory <- function(cm, md, expr) {
   md <- md[, !grepl('^DMC', colnames(md))]
   md <- cbind(md, rd)
   
-  pricu <- principal.curve(rd, smoother='lowess', trace=TRUE, f=1/3, stretch=333)
+  pricu <- principal.curve(rd, smoother='lowess', trace=TRUE, f=pricu.f, stretch=333)
   pc.line <- as.data.frame(pricu$s[order(pricu$lambda), ])
   md$maturation.score <- pricu$lambda/max(pricu$lambda)
   
@@ -277,7 +276,7 @@ maturation.trajectory <- function(cm, md, expr) {
   mt.th <- max(subset(md, cc.phase.fit > mean(md$in.cc.phase)/2 & maturation.score.smooth >= 0.2 & maturation.score.smooth <= 0.8)$maturation.score.smooth)
   
   md$postmitotic <- md$maturation.score.smooth > mt.th
-  return(list(md=md, pricu=pricu, mt.th=mt.th))
+  return(list(md=md, pricu=pricu, pc.line=pc.line, mt.th=mt.th))
 }
 
 
@@ -585,4 +584,70 @@ varex <- function(cm, md, norm.fac, foi, x=c()) {
     }
   }
   return(list(x.pca.sdev=x.pca$sdev, fraction.explained=fraction.explained))
+}
+
+
+###############################################################################
+# for mapping cells (e.g. 10x cells onto dropseq branches)
+
+transfer.label.cor <- function(expr.a, labels.a, expr.b) {
+  # average expr by label
+  expr.a.agg <- t(apply(expr.a, 1, function(x) aggregate(x, by=list(labels.a), FUN=mean)$x))
+  cmat <- cor(expr.b, expr.a.agg, method='pearson', use='pairwise.complete.obs')
+  colnames(cmat) <- paste0('cor.', sort(unique(labels.a)))
+  res.df <- data.frame(label=sort(unique(labels.a))[apply(cmat, 1, which.max)], cor=apply(cmat, 1, max))
+  # get background correlation based on randomized expr.b
+  cor.bg <- sapply(1:100, function(x) apply(cor(matrix(sample(expr.b), nrow(expr.b)), expr.a.agg, method='pearson', use='pairwise.complete.obs'), 1, max))
+  res.df$cor.p <- sapply(res.df$cor, function(x) mean(cor.bg >= x))
+  res.df$cor.p.adjust <- p.adjust(res.df$cor.p, method = 'fdr')
+  res.df <- cbind(res.df, cmat)
+  return(res.df)
+}
+
+
+markers.ttest <- function(expr, label, n) {
+  label <- as.character(label)
+  labels <- sort(unique(label))
+  L <- length(labels)
+  pvals <- c()
+  logfc <- c()
+  cntr <- 0
+  for (i in 1:L) {
+    lab1 <- labels[i]
+    sel1 <- which(label == lab1)
+    lab2 <- 'all'
+    sel2 <- which(label != lab1)
+    cname <- sprintf('%s_vs_%s', lab1, lab2)
+    cntr <- cntr + 1
+    p.values <- unlist(mclapply(1:nrow(expr), function(g) t.test(expr[g, sel1, drop=FALSE], expr[g, sel2, drop=FALSE], alternative='greater')$p.value), recursive = TRUE, use.names = TRUE)
+    fc <- apply(expr[, sel2, drop=FALSE], 1, mean) - apply(expr[, sel1, drop=FALSE], 1, mean)
+    p.values[is.na(p.values)] <- 1
+    adj.p <- p.adjust(p.values, method='fdr')
+    pvals <- cbind(pvals, adj.p)
+    logfc <- cbind(logfc, fc)
+    colnames(pvals)[cntr] <- cname
+    colnames(logfc)[cntr] <- cname
+  }
+  rownames(pvals) <- rownames(expr)
+  markers <- as.character(unlist(apply(pvals, 2, function(x) names(which(rank(x) <= n)))))
+  return(markers)
+}
+
+
+###############################################################################
+# for single-cell cluster heatmaps
+
+sc.cluster.heatmap <- function(expr, label, n, fname) {
+  marker.genes <- markers.ttest(expr, label, n)
+  o <- order(label, na.last=NA)
+  cs <- cumsum(table(label[o]))
+  tmp <- t(scale(t(expr[marker.genes, o])))
+  tmp[tmp > 2] <- 2
+  tmp[tmp < -2] <- -2
+  pdf(file = fname, width=5, height=6, pointsize = 8, useDingbats = FALSE)
+  hm <- heatmap.2(tmp, scale = 'none', trace='none', col=colorRampPalette(c("black", "black", "#f1a340"))(31), 
+                  Colv=NA, Rowv=NA, dendrogram = 'none', key = TRUE, density.info = 'none', colsep=cs,
+                  key.title = NA, key.xlab = 'Row-scaled expression', margins=c(1,9))
+  dev.off()
+  return(hm)
 }
