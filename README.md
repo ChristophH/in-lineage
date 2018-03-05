@@ -7,8 +7,9 @@ by Christian Mayer#, Christoph Hafemeister#, Rachel C. Bandler#, Robert Machold,
 \# Equal contribution  
 \* Corresponding authors
 
-Preprint on [bioRxiv](https://www.biorxiv.org/content/early/2017/09/13/105312)  
-doi: [https://doi.org/10.1101/105312](https://doi.org/10.1101/105312)
+[*Nature*, Advanced Online Publication 05 March 2018, doi:10.1038/nature25999](https://dx.doi.org/10.1038/nature25999)
+
+[Preprint on bioRxiv](https://www.biorxiv.org/content/early/2017/09/13/105312)  
 
 ### How to run
 
@@ -21,6 +22,8 @@ There are individual scripts for the different parts of the analysis. Run them i
 5. Rscript R/branch_analysis.R MGE
 6. Rscript R/map_10x_E14_to_branches.R
 7. Rscript R/variance_explained.R
+
+Code related to the integrated analysis linking heterogenity in our data to heterogeneity in adult cells (Figure 4) is provided by Christian Mayer [in his repository](https://github.com/mayer-lab/Mayer-et-al-2018_IntegratedAnalysis).
 
 ### R/maturation_trajectory.R
 
