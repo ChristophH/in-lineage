@@ -56,8 +56,13 @@ map.cge <- readRDS('results/CGE_E14.5_Lhx6neg_mapped.Rds')
 map.mge <- readRDS('results/MGE_E14.5_Lhx6pos_mapped.Rds')
 map.both <- rbind(map.cge, map.mge)
 
-cm <- readRDS('data/10x_digitial_expression.Rds')
-md <- readRDS('data/10x_meta_data.Rds')
+cm <- cbind(readRDS('data/10x_digitial_expression_E13.Rds'),
+            readRDS('data/10x_digitial_expression_E18.Rds'),
+            readRDS('data/10x_digitial_expression_P10.Rds'))
+md <- rbind(readRDS('data/10x_meta_data_E13.Rds'),
+            readRDS('data/10x_meta_data_E18.Rds'),
+            readRDS('data/10x_meta_data_P10.Rds'))
+
 sel <- intersect(rownames(md), rownames(map.both))
 md <- md[sel, ]
 cm <- cm[, rownames(md)]

@@ -28,8 +28,12 @@ options(mc.cores = 6)
 #result.bn <- 'all_samples'
 
 # load digital expression matrix and meta data
-cm <- readRDS('data/10x_digitial_expression.Rds')
-md <- readRDS('data/10x_meta_data.Rds')
+cm <- cbind(readRDS('data/10x_digitial_expression_E13.Rds'),
+            readRDS('data/10x_digitial_expression_E18.Rds'),
+            readRDS('data/10x_digitial_expression_P10.Rds'))
+md <- rbind(readRDS('data/10x_meta_data_E13.Rds'),
+            readRDS('data/10x_meta_data_E18.Rds'),
+            readRDS('data/10x_meta_data_P10.Rds'))
 
 # since the CGE_E14.5_Lhx6neg sample contains a mix of mitotic and post-mitotic cells
 # we need to do a maturation trajectory analysis (as for the dropseq data)
