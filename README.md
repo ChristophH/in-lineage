@@ -9,6 +9,8 @@ by Christian Mayer#, Christoph Hafemeister#, Rachel C. Bandler#, Robert Machold,
 
 [*Nature*, Advanced Online Publication 05 March 2018, doi:10.1038/nature25999](https://dx.doi.org/10.1038/nature25999)
 
+[Free read-only version of the full published article through Springer Nature SharedIt](http://rdcu.be/JA5l)
+
 [Preprint on bioRxiv](https://www.biorxiv.org/content/early/2017/09/13/105312)  
 
 ### How to run
