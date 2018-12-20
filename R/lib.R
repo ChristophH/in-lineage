@@ -33,7 +33,9 @@ enr.score <- function(expr, goi, bg.lst) {
 }
 
 
-get.cc.score <- function(cm, N=100, seed=42) {
+get.cc.score <- function(cm, N=100, seed=42, 
+                         s.gene.file='./annotation/s_genes.txt',
+                         g2m.gene.file='./annotation/g2m_genes.txt') {
   set.seed(seed)
   cat('get.cc.score, ')
   cat('number of random background gene sets set to', N, '\n')
@@ -51,8 +53,8 @@ get.cc.score <- function(cm, N=100, seed=42) {
   names(gene.bin) <- rownames(cm)
   gene.bin[is.na(gene.bin)] <- 0
   
-  regev.s.genes <- read.table(file='./annotation/s_genes.txt', header=FALSE, stringsAsFactors=FALSE)$V1
-  regev.g2m.genes <- read.table(file='./annotation/g2m_genes.txt', header=FALSE, stringsAsFactors=FALSE)$V1
+  regev.s.genes <- read.table(file=s.gene.file, header=FALSE, stringsAsFactors=FALSE)$V1
+  regev.g2m.genes <- read.table(file=g2m.gene.file, header=FALSE, stringsAsFactors=FALSE)$V1
   
   goi.lst <- list('S'=rownames(cm)[!is.na(match(toupper(rownames(cm)), regev.s.genes))],
                   'G2M'=rownames(cm)[!is.na(match(toupper(rownames(cm)), regev.g2m.genes))])

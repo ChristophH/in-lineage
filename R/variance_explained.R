@@ -52,8 +52,8 @@ ggsave(g2, filename = 'results/variance_explained_dropseq_mitotic_CGE_MGE.pdf', 
 # do the same analysis for the E14.5 10x cells
 
 # get the branch assignments from the mapping analysis
-map.cge <- readRDS('results/CGE_E14.5_Lhx6neg_mapped.Rds')
-map.mge <- readRDS('results/MGE_E14.5_Lhx6pos_mapped.Rds')
+map.cge <- readRDS('results/CGE_E13.5_Lhx6neg_mapped.Rds')
+map.mge <- readRDS('results/MGE_E13.5_Lhx6pos_mapped.Rds')
 map.both <- rbind(map.cge, map.mge)
 
 cm <- cbind(readRDS('data/10x_digitial_expression_E13.Rds'),
@@ -86,5 +86,5 @@ g2 <- ggplot(df2) + geom_bar(aes(x=fac, y=var.expl/pc1.varex), stat='identity') 
   theme(panel.grid.major = element_line(colour = "grey90", size = 0.3), panel.grid.minor = element_blank()) +
   theme(panel.grid.major.x = element_blank(), axis.title.x = element_blank()) +
   theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1))
-ggsave(g2, filename = 'results/variance_explained_10x_E14.5_CGE_MGE.pdf', width = 4, height = 8 , units = 'cm')
+ggsave(g2, filename = 'results/variance_explained_10x_E13.5_CGE_MGE.pdf', width = 4, height = 8 , units = 'cm')
 

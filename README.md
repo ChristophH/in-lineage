@@ -102,20 +102,22 @@ running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
 
 this script performs the following steps:
 
-1. load 10x data and subset to E14.5 Lhx6neg (CGE)  
+1. load 10x data and subset to E13.5 Lhx6neg (CGE)  
 2. re-normalize data and run maturation trajectory analysis to isolate post-mitotic cells  
 3. cluster cells and remove Lhx6 positive clusters (contamination)  
-4. also load the 10x E14.5 Lhx6pos (MGE) cells  
+4. also load the 10x E13.5 Lhx6pos (MGE) cells  
 5. map both set of cells to the branches identified in E13.5 dropseq data  
+
+Note that we use E13.5 and E14 to refer to these cells, but only the MGE cells are E13.5 and the CGE cells are actually E14.5.
 
 these files are created in results directory:
 
-* CGE\_E14.5\_Lhx6neg\_maturation\_trajectory.pdf
-* CGE\_E14.5\_Lhx6neg\_postmitotic\_clusters\_lhx6\_detection\_rate.pdf
-* CGE\_E14.5\_Lhx6neg\_mapped.Rds
-* MGE\_E14.5\_Lhx6pos\_mapped.Rds
-* CGE\_E14.5\_Lhx6neg\_mapped\_single\_cell\_heatmap.pdf
-* MGE\_E14.5\_Lhx6pos\_mapped\_single\_cell\_heatmap.pdf
+* CGE\_E13.5\_Lhx6neg\_maturation\_trajectory.pdf
+* CGE\_E13.5\_Lhx6neg\_postmitotic\_clusters\_lhx6\_detection\_rate.pdf
+* CGE\_E13.5\_Lhx6neg\_mapped.Rds
+* MGE\_E13.5\_Lhx6pos\_mapped.Rds
+* CGE\_E13.5\_Lhx6neg\_mapped\_single\_cell\_heatmap.pdf
+* MGE\_E13.5\_Lhx6pos\_mapped\_single\_cell\_heatmap.pdf
 
 running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
 (using 6 cores for some of the steps)
@@ -128,13 +130,13 @@ this script performs the following steps:
 
 1. load mitotic cells from CGE and MGE dropseq experiments
 2. quantify variance explained by individual factors
-3. load E14.5 10x data and subset to postmitotic cells
+3. load E13.5 10x data and subset to postmitotic cells
 4. quantify variance explained by individual factors
 
 these files are created in results directory:
 
 * variance\_explained\_dropseq\_mitotic\_CGE\_MGE.pdf
-* variance\_explained\_10x\_E14.5\_CGE\_MGE.pdf
+* variance\_explained\_10x\_E13.5\_CGE\_MGE.pdf
 
 running times on an Intel Xeon Processor E5-2697 v3 @ 2.6 to 3.6 GHz
 (using 6 cores for some of the steps)

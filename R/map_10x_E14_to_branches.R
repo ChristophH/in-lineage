@@ -1,8 +1,8 @@
 # this script performs the following steps:
-# 1) load 10x data and subset to E14.5 Lhx6neg (CGE)
+# 1) load 10x data and subset to E13.5 Lhx6neg (CGE)
 # 2) re-normalize data and run maturation trajectory analysis to isolate post-mitotic cells
 # 3) cluster cells and remove Lhx6 positive clusters (contamination)
-# 4) also load the 10x E14.5 Lhx6pos (MGE) cells
+# 4) also load the 10x E13.5 Lhx6pos (MGE) cells
 # 5) map both set of cells to the branches identified in E13.5 dropseq data
 
 # these files are created in results directory:
@@ -35,10 +35,10 @@ md <- rbind(readRDS('data/10x_meta_data_E13.Rds'),
             readRDS('data/10x_meta_data_E18.Rds'),
             readRDS('data/10x_meta_data_P10.Rds'))
 
-# since the CGE_E14.5_Lhx6neg sample contains a mix of mitotic and post-mitotic cells
+# since the CGE_E13.5_Lhx6neg sample contains a mix of mitotic and post-mitotic cells
 # we need to do a maturation trajectory analysis (as for the dropseq data)
 # in order to isolate the post-mitotic cells
-md.cge <- subset(md, sample.name == 'CGE_E14.5_Lhx6neg')
+md.cge <- subset(md, sample.name == 'CGE_E13.5_Lhx6neg')
 cm.cge <- cm[, rownames(md.cge)]
 
 # get cell-cycle score
@@ -80,7 +80,7 @@ pc.line <- mat.traj$pc.line
 mt.th <- mat.traj$mt.th
 
 # visualize result
-pdf(sprintf('results/%s_maturation_trajectory.pdf', 'CGE_E14.5_Lhx6neg'), width = 7, height = 5)
+pdf(sprintf('results/%s_maturation_trajectory.pdf', 'CGE_E13.5_Lhx6neg'), width = 7, height = 5)
 
 g <- ggplot(md.cge, aes(DMC1, DMC2)) + geom_point(aes(color=maturation.score.smooth), size=1, shape=16) + 
   scale_color_gradientn(colours=my.cols.RYG, name='Maturation score') +
@@ -117,7 +117,7 @@ det.rate <- data.frame(aggregate(cm.cge['Lhx6', ] > 0, by=list(cl$clustering), F
 colnames(det.rate) <- c('cluster', 'Lhx6.detection.rate')
 det.rate$cluster <- factor(det.rate$cluster, levels=det.rate$cluster, ordered=TRUE)
 g <- ggplot(det.rate, aes(cluster, Lhx6.detection.rate)) + geom_bar(stat='identity') 
-ggsave('results/CGE_E14.5_Lhx6neg_postmitotic_clusters_lhx6_detection_rate.pdf', width=8, height=6, units='cm')
+ggsave('results/CGE_E13.5_Lhx6neg_postmitotic_clusters_lhx6_detection_rate.pdf', width=8, height=6, units='cm')
 
 # discard Lhx6+ cells and those that are in Lhx6+ clusters
 keep <- cm.cge['Lhx6', ] <= 0 & cl$clustering %in% as.numeric(as.character(subset(det.rate, Lhx6.detection.rate <= 0.2)$cluster))
@@ -128,7 +128,7 @@ expr.cge <- expr[, keep]
 
 
 # get the Lhx6 positive (MGE) data set
-md.mge <- subset(md, sample.name == 'MGE_E14.5_Lhx6pos')
+md.mge <- subset(md, sample.name == 'MGE_E13.5_Lhx6pos')
 cm.mge <- cm[, rownames(md.mge)]
 
 # get cell-cycle score
@@ -162,14 +162,14 @@ map.mge <- transfer.label.cor(expr.avg[de.genes, ], colnames(expr.avg), expr.mge
 table(map.mge$label, map.mge$cor.p.adjust < 0.1)
 
 # save results
-saveRDS(map.cge, 'results/CGE_E14.5_Lhx6neg_mapped.Rds')
-saveRDS(map.mge, 'results/MGE_E14.5_Lhx6pos_mapped.Rds')
+saveRDS(map.cge, 'results/CGE_E13.5_Lhx6neg_mapped.Rds')
+saveRDS(map.mge, 'results/MGE_E13.5_Lhx6pos_mapped.Rds')
 
 # plot results
 map.cge$label[map.cge$cor.p.adjust >= 0.1] <- NA
-hm <- sc.cluster.heatmap(expr.cge, map.cge$label, 15, 'results/CGE_E14.5_Lhx6neg_mapped_single_cell_heatmap.pdf')
+hm <- sc.cluster.heatmap(expr.cge, map.cge$label, 15, 'results/CGE_E13.5_Lhx6neg_mapped_single_cell_heatmap.pdf')
 map.mge$label[map.mge$cor.p.adjust >= 0.1] <- NA
-hm <- sc.cluster.heatmap(expr.mge, map.mge$label, 15, 'results/MGE_E14.5_Lhx6pos_mapped_single_cell_heatmap.pdf')
+hm <- sc.cluster.heatmap(expr.mge, map.mge$label, 15, 'results/MGE_E13.5_Lhx6pos_mapped_single_cell_heatmap.pdf')
 
 
 
